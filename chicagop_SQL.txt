@@ -1,0 +1,93 @@
+SELECT
+    c.company_name,
+    COUNT(t.trip_id) AS trips_amount
+FROM
+    trips t
+JOIN
+    cabs c ON t.cab_id = c.cab_id
+WHERE
+    DATE(t.start_ts) BETWEEN '2017-11-15' AND '2017-11-16'
+GROUP BY
+    c.company_name
+ORDER BY
+    trips_amount DESC;
+
+
+--nueva consulta_2--
+SELECT
+    c.company_name,
+    COUNT(t.trip_id) AS trips_amount
+FROM
+    trips t
+JOIN
+    cabs c ON t.cab_id = c.cab_id
+WHERE
+    DATE(t.start_ts) BETWEEN '2017-11-01' AND '2017-11-07'
+    AND (
+        c.company_name ILIKE '%yellow%'
+        OR c.company_name ILIKE '%blue%'
+    )
+GROUP BY
+    c.company_name;
+
+-- nueva consulta_3--
+SELECT
+    CASE
+        WHEN c.company_name IN ('Flash Cab', 'Taxi Affiliation Services')
+            THEN c.company_name
+        ELSE 'Other'
+    END AS company,
+    COUNT(t.trip_id) AS trips_amount
+FROM
+    trips t
+JOIN
+    cabs c ON t.cab_id = c.cab_id
+WHERE
+    DATE(t.start_ts) BETWEEN '2017-11-01' AND '2017-11-07'
+GROUP BY
+    company
+ORDER BY
+    trips_amount DESC;
+
+--nueva consulta_4--
+SELECT
+    neighborhood_id,
+    name
+FROM
+    neighborhoods
+WHERE
+    name IN ('O''Hare', 'Loop');
+
+--nueva consulta_5--
+SELECT
+    ts,
+    CASE
+        WHEN description ILIKE '%rain%'
+          OR description ILIKE '%storm%'
+            THEN 'Bad'
+        ELSE 'Good'
+    END AS weather_conditions
+FROM
+    weather_records;
+
+--nueva consulta_6--
+SELECT
+    t.start_ts,
+    CASE
+        WHEN w.description ILIKE '%rain%'
+          OR w.description ILIKE '%storm%'
+            THEN 'Bad'
+        ELSE 'Good'
+    END AS weather_conditions,
+    t.duration_seconds
+FROM
+    trips t
+JOIN
+    weather_records w
+    ON t.start_ts = w.ts
+WHERE
+    t.pickup_location_id = 50
+    AND t.dropoff_location_id = 63
+    AND EXTRACT(DOW FROM t.start_ts) = 6
+ORDER BY
+    t.trip_id;
